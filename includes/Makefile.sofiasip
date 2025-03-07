@@ -20,7 +20,7 @@ $(SOFPATCHDESTDIR)/%.patch: $(SOFPATCHSRCDIR)/%.patch | $(SOFPATCHDESTDIR)
 .PHONY: libsofia
 libsofia: $(DEBDEST)/$(SOFIADEB)
 
-$(DOWNLOADS)/$(SOFIAFILENAME):
+$(DOWNLOADS)/$(SOFIAFULLFILENAME):
 	wget -nc -O $(@) $(SOFIAURL)
 
 $(SOFDIR)/debian: $(BUILDSOURCE)/$(SOFIAFILENAME)
@@ -34,6 +34,13 @@ $(BUILDSOURCE)/$(SOFIADEB): $(BASEDOCKERTAG) | $(SOFDIR)/debian $(SOFPATCHESDEST
 	./genchangelog.sh sofia-sip "$(SOFIAVERSION)-$(SOFIARELEASE)" $(BUILDSOURCE)/$(SOFIAPREFIX)
 	docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(SOFIAPREFIX) basedocker:$(VERSION) dpkg-buildpackage -us -uc
 
+# We tag the filename with the hash, but remove it for the build. This
+# overrides the cp in common
+$(BUILDSOURCE)/$(SOFIAFILENAME): $(DOWNLOADS)/$(SOFIAFULLFILENAME) | $(BUILDSOURCE)
+	@echo 'Sofia Override copying $< to $@'
+	cp $< $@
+
+$(DOWNLOADS)/$(SDSPFULLFILENAME): | $(DOWNLOADS)
 $(addprefix $(DEBDEST)/,$(SOFIADEBS)): $(BUILDSOURCE)/$(SOFIADEB) | $(DEBDEST)
 	cp $(BUILDSOURCE)/$(@F) $@
 

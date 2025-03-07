@@ -16,7 +16,7 @@ SDSPPDEST=$(BUILDSOURCE)/$(SDSPPREFIX)/debian/patches
 $(addprefix $(BUILDSOURCE)/,$(SDSPDEBS)): $(BUILDSOURCE)/$(SDSPFILENAME) $(BASEDOCKERTAG)
 	rm -rf $(BUILDSOURCE)/$(SDSPPREFIX) && mkdir -p $(BUILDSOURCE) && cd $(BUILDSOURCE) && tar xf $<
 	./genchangelog.sh spandsp "$(SDSPVER)-$(SDSPREL)" $(BUILDSOURCE)/$(SDSPPREFIX) "Git hash $(SPANDSPHASH)"
-	mkdir -p $(SDSPPDEST); for p in $(ROOT)/patches/spandsp/*; do cp $$p $(SDSPPDEST)/ && echo $$(basename $$p) >> $(SDSPPDEST)/series; done
+	mkdir -p $(SDSPPDEST); for p in $(wildcard $(ROOT)/patches/spandsp/*.patch); do cp $$p $(SDSPPDEST)/ && echo $$(basename $$p) >> $(SDSPPDEST)/series; done
 	docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(SDSPPREFIX) basedocker:$(VERSION) dpkg-buildpackage -us -uc
 
 # We tag the filename with the hash, but remove it for the build. This

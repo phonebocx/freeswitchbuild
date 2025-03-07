@@ -58,6 +58,7 @@ FSMAINDEB=freeswitch_$(FSRELEASE)_amd64.deb
 
 SOFIAURL=https://github.com/freeswitch/sofia-sip/tarball/$(SOFIAHASH)
 SOFIASHORT=$(shell echo $(SOFIAHASH) | cut -c1-7)
+SOFIAFULLFILENAME=sofia-sip-$(SOFIASHORT).orig.tar.gz
 SOFIAPREFIX=freeswitch-sofia-sip-$(SOFIASHORT)
 SOFIATAG=$(SOFIAVERSION)-$(SOFIARELEASE)
 SOFIADEB=libsofia-sip-ua0_$(SOFIATAG)_amd64.deb

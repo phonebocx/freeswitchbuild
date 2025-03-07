@@ -1,15 +1,15 @@
 ## Things to change
 ##
 ##  https://github.com/freeswitch/spandsp
-SPANDSPHASH=7b0b8cf3d42b725405bcc63145de5e280265ce4e
+SPANDSPHASH=69ef51d1baa019520b7d5b058ef0e7124487c100
 SDSPVER=3.0.0
 SDSPREL=47
 
 ## Git hash for libstirshaken 
 ##   https://github.com/signalwire/libstirshaken
 ##
-## Note 2023-10-18: (Still true 2024-02-02)
-##   This is a commit from the `test` branch, not from master. This is due
+## Note 2023-10-18: (Still true 2025-03-07)
+##   This is a commit from the `tests` branch, not from master. This is due
 ##   to https://github.com/signalwire/libstirshaken/issues/138 causing
 ##   the tests to fail being compiled, because of a missing include path.
 ##   This should be updated to master when this is merged.
@@ -19,30 +19,34 @@ LIBSSREL=2
 
 ## Git hash for libkitchensink
 ##   https://github.com/signalwire/libks
-LIBKSHASH=2653d516cc485d748b6ef45a2a614d494fdd44ac
-LIBKSVERS=2.0.3
+LIBKSHASH=5b9dcfbc04a77f67b025b6e75929706481e2c7ce
+LIBKSVERS=2.0.6
 LIBKSREL=2
 
 ## libjwt version
 ##   https://github.com/benmcollins/libjwt
-LIBJWTVERS=1.15.3
+LIBJWTVERS=1.18.3
 LIBJWTREL=1
 
 ## Git hash for libsofia-sip 
 ##   https://github.com/freeswitch/sofia-sip
-SOFIAHASH=aa96cbcaf9796791b7d5b5928c08b3da44623e0e
-## What version and release we are claiming it is.
+SOFIAHASH=b29808708d45646bd8731505c4961d9d66942694
+## What version and release we are claiming it is. This hasn't
+## been updated since 2023 upstream
+##
+##  https://github.com/freeswitch/sofia-sip/commit/fd28c999a50bf66b2709429432c30255e2a86a4c
+##
 SOFIAVERSION=1.13.17
-SOFIARELEASE=2
+SOFIARELEASE=3
 SOFIAFILENAME=sofia-sip_$(SOFIAVERSION).orig.tar.gz
 
 ## Git hash for freeswitch
 ##   https://github.com/signalwire/freeswitch
-FSHASH=9df3076f29a52a690ebd25b1972a8b97d55442e0
+FSHASH=f11e95e3fb95b072a6ff38a3704d6d13eac4d23d
 ## What version of freeswitch we are claiming it is
 FSMAJOR=1
 FSMINOR=10
-FSMICRO=11
+FSMICRO=12
 HREV=
 FSVERSION=$(FSMAJOR).$(FSMINOR).$(FSMICRO)
 ## Note that there's FSREV in Makefile which is used to update the
