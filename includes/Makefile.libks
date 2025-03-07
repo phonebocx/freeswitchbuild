@@ -1,0 +1,29 @@
+
+######
+##
+## libks
+##
+
+.PHONY: libks
+libks: $(DEBDEST)/$(LIBKSDEB)
+
+libks-shell: $(BUILDSOURCE)/$(LIBKSPREFIX)/$(LIBKSDEB)
+	docker run --rm $(VOLUMES) -it -e PACKAGE_RELEASE=$(LIBKSREL) -w /usr/local/build/SOURCES/$(LIBKSPREFIX) basedocker:$(VERSION) bash
+
+$(DEBDEST)/$(LIBKSDEB): $(BUILDSOURCE)/$(LIBKSPREFIX)/$(LIBKSDEB)
+	cp $< $@
+
+$(BUILDSOURCE)/$(LIBKSPREFIX)/$(LIBKSDEB): $(BASEDOCKERTAG) $(BUILDSOURCE)/$(LIBKSFILENAME)
+	cd $(BUILDSOURCE) && rm -rf $(LIBKSPREFIX) && tar xvf $(BUILDSOURCE)/$(LIBKSFILENAME)
+	# Disable changelog generation
+	sed -i 's/GIT_FOUND AND GZIP_CMD AND DATE_CMD/FALSE/' $(BUILDSOURCE)/$(LIBKSPREFIX)/CMakeLists.txt
+	docker run --rm $(VOLUMES) -it -e PACKAGE_RELEASE=$(LIBKSREL) -w /usr/local/build/SOURCES/$(LIBKSPREFIX) basedocker:$(VERSION) cmake . -DCMAKE_BUILD_TYPE=Release
+	docker run --rm $(VOLUMES) -it -e PACKAGE_RELEASE=$(LIBKSREL) -w /usr/local/build/SOURCES/$(LIBKSPREFIX) basedocker:$(VERSION) make package
+
+$(DOWNLOADS)/$(LIBKSFILENAME):
+	wget $(LIBKSURL) -O $(@)
+
+##
+##
+######
+

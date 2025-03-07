@@ -1,0 +1,43 @@
+
+######
+##
+## lib-sofia-sip
+##
+
+SOFDIR=$(BUILDSOURCE)/$(SOFIAPREFIX)
+SOFPATCHSRCDIR=$(ROOT)/patches/sofia-sip
+SOFPATCHDESTDIR=$(SOFDIR)/debian/patches
+SOFPATCHES=$(notdir $(wildcard $(SOFPATCHSRCDIR)/*.patch))
+
+SOFPATCHESDEST=$(addprefix $(SOFPATCHDESTDIR)/,$(SOFPATCHES))
+
+$(SOFPATCHDESTDIR):
+	mkdir -p $@
+
+$(SOFPATCHDESTDIR)/%.patch: $(SOFPATCHSRCDIR)/%.patch | $(SOFPATCHDESTDIR)
+	cp $(<) $(@)
+
+.PHONY: libsofia
+libsofia: $(DEBDEST)/$(SOFIADEB)
+
+$(DOWNLOADS)/$(SOFIAFILENAME):
+	wget -nc -O $(@) $(SOFIAURL)
+
+$(SOFDIR)/debian: $(BUILDSOURCE)/$(SOFIAFILENAME)
+	rm -rf $(BUILDSOURCE)/$(SOFIAPREFIX) && mkdir -p $(BUILDSOURCE) && cd $(BUILDSOURCE) && tar xf $(BUILDSOURCE)/$(SOFIAFILENAME)
+	mkdir -p $(SOFPATCHDESTDIR)
+	mkdir -p $(SOFDIR)/debian/source
+	rm -f $(SOFPATCHDESTDIR)/series && for p in $(SOFPATCHES); do echo $$p >> $(SOFPATCHDESTDIR)/series; done
+	echo '3.0 (quilt)' > $(SOFDIR)/debian/patches/series
+
+$(BUILDSOURCE)/$(SOFIADEB): $(BASEDOCKERTAG) | $(SOFDIR)/debian $(SOFPATCHESDEST)
+	./genchangelog.sh sofia-sip "$(SOFIAVERSION)-$(SOFIARELEASE)" $(BUILDSOURCE)/$(SOFIAPREFIX)
+	docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(SOFIAPREFIX) basedocker:$(VERSION) dpkg-buildpackage -us -uc
+
+$(addprefix $(DEBDEST)/,$(SOFIADEBS)): $(BUILDSOURCE)/$(SOFIADEB) | $(DEBDEST)
+	cp $(BUILDSOURCE)/$(@F) $@
+
+##
+##
+##
+#####

@@ -1,0 +1,56 @@
+## Things to change
+##
+##  https://github.com/freeswitch/spandsp
+SPANDSPHASH=7b0b8cf3d42b725405bcc63145de5e280265ce4e
+SDSPVER=3.0.0
+SDSPREL=47
+
+## Git hash for libstirshaken 
+##   https://github.com/signalwire/libstirshaken
+##
+## Note 2023-10-18: (Still true 2024-02-02)
+##   This is a commit from the `test` branch, not from master. This is due
+##   to https://github.com/signalwire/libstirshaken/issues/138 causing
+##   the tests to fail being compiled, because of a missing include path.
+##   This should be updated to master when this is merged.
+LIBSSHASH=65272ac2f4af05d9e25d04753e2ecbeddb23e6d0
+LIBSSVERS=2023.08.22
+LIBSSREL=2
+
+## Git hash for libkitchensink
+##   https://github.com/signalwire/libks
+LIBKSHASH=2653d516cc485d748b6ef45a2a614d494fdd44ac
+LIBKSVERS=2.0.3
+LIBKSREL=2
+
+## libjwt version
+##   https://github.com/benmcollins/libjwt
+LIBJWTVERS=1.15.3
+LIBJWTREL=1
+
+## Git hash for libsofia-sip 
+##   https://github.com/freeswitch/sofia-sip
+SOFIAHASH=aa96cbcaf9796791b7d5b5928c08b3da44623e0e
+## What version and release we are claiming it is.
+SOFIAVERSION=1.13.17
+SOFIARELEASE=2
+SOFIAFILENAME=sofia-sip_$(SOFIAVERSION).orig.tar.gz
+
+## Git hash for freeswitch
+##   https://github.com/signalwire/freeswitch
+FSHASH=9df3076f29a52a690ebd25b1972a8b97d55442e0
+## What version of freeswitch we are claiming it is
+FSMAJOR=1
+FSMINOR=10
+FSMICRO=11
+HREV=
+FSVERSION=$(FSMAJOR).$(FSMINOR).$(FSMICRO)
+## Note that there's FSREV in Makefile which is used to update the
+## dpkg rev (when you're updating the fshash, but not the actual
+## versions), which is appended to VERSION. This means the actual
+## debs look like this (if VERSION is 20220815 and FSREV is 002)
+##  freeswitch-mod-g729-dbg_1.10.8-20220815~002_amd64.deb
+
+## Download these dependancies before building freeswitch
+FSDEPS=pocketsphinx-0.8.tar.gz sphinxbase-0.8.tar.gz communicator_semi_6000_20080321.tar.gz freeradius-client-1.1.7.tar.gz
+

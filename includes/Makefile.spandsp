@@ -1,0 +1,34 @@
+
+######
+##
+## SpanDSP
+##
+.PHONY: spandsp spandsp-shell
+spandsp: $(addprefix $(DEBDEST)/,$(SDSPDEBS))
+
+spandsp-shell:
+	docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(SDSPPREFIX) basedocker:$(VERSION) bash
+
+$(addprefix $(DEBDEST)/,$(SDSPDEBS)): $(addprefix $(BUILDSOURCE)/,$(SDSPDEBS)) | $(DEBDEST)
+	cp $(BUILDSOURCE)/$(@F) $@
+
+SDSPPDEST=$(BUILDSOURCE)/$(SDSPPREFIX)/debian/patches
+$(addprefix $(BUILDSOURCE)/,$(SDSPDEBS)): $(BUILDSOURCE)/$(SDSPFILENAME) $(BASEDOCKERTAG)
+	rm -rf $(BUILDSOURCE)/$(SDSPPREFIX) && mkdir -p $(BUILDSOURCE) && cd $(BUILDSOURCE) && tar xf $<
+	./genchangelog.sh spandsp "$(SDSPVER)-$(SDSPREL)" $(BUILDSOURCE)/$(SDSPPREFIX) "Git hash $(SPANDSPHASH)"
+	mkdir -p $(SDSPPDEST); for p in $(ROOT)/patches/spandsp/*; do cp $$p $(SDSPPDEST)/ && echo $$(basename $$p) >> $(SDSPPDEST)/series; done
+	docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(SDSPPREFIX) basedocker:$(VERSION) dpkg-buildpackage -us -uc
+
+# We tag the filename with the hash, but remove it for the build. This
+# overrides the cp in common
+$(BUILDSOURCE)/$(SDSPFILENAME): $(DOWNLOADS)/$(SDSPFULLFILENAME) | $(BUILDSOURCE)
+	@echo 'Override copying $< to $@'
+	cp $< $@
+
+$(DOWNLOADS)/$(SDSPFULLFILENAME): | $(DOWNLOADS)
+	wget $(SDSPURL) -O $(@)
+##
+##
+##
+######
+
