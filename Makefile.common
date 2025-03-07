@@ -68,6 +68,10 @@ DOCKERTAGS=$(LIBSSDOCKERTAG) $(FSDOCKERTAG) $(BASEDOCKERTAG)
 
 SRCDEBS=$(SDSPDEBS) $(SOFIADEBS) $(LIBJWTDEBS) $(LIBKSDEB) $(LIBSSDEBS)
 
+# FSMAINDEB is not here, as this is only for dumpdebs which pulls them
+# in from the control file
+ALLDEBS=$(SRCDEBS)
+
 ## This is used in a bunch of places
 TIMESTAMP=$(shell date '+%a, %d %b %Y %T -0000' --utc)
 

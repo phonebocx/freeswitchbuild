@@ -67,12 +67,19 @@ distclean: clean
 stage1: $(addprefix $(DEBDEST)/,$(SRCDEBS))
 	@echo Stage 1 debs complete, build $(SRCDEBS)
 
+.PHONY: debs
 debs: setup stage1 freeswitch
 
 libssdocker/%.deb fsdocker/%.deb: $(DEBDEST)/%.deb
 	cp $< $@
 
-DPATCHDEB=dpatch_2.0.41_all.deb
-DPATCHSRC=http://ftp.au.debian.org/debian/pool/main/d/dpatch/$(DPATCHDEB)
+.PHONY: dumpdebs rawdumpdebs
+# This is all debs that exist to be used with automation
+dumpdebs:
+	@echo $(wildcard $(addprefix $(DEBDEST)/,$(ALLDEBS)) $(FSDEBSCREATED))
+
+# Debugging of what SHOULD be there
+rawdumpdebs:
+	@echo $(addprefix $(DEBDEST)/,$(ALLDEBS)) $(FSDEBSCREATED)
 
 

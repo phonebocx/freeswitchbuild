@@ -26,11 +26,21 @@ $(DEBDEST)/freeswitch%.deb $(DEBDEST)/libfreeswitch%:
 $(DEBDEST)/$(FSMAINDEB): $(BUILDSOURCE)/$(FSMAINDEB)
 	cp $< $@
 
+# Building assistance.  If this is set to true, dpkg-buildpackage will run.
+# If it's set to false, it'll just dump you into a shell ready to run it yourself
+# manually.
+FSBUILDPACKAGE=true
+
 $(BUILDSOURCE)/$(FSMAINDEB): $(FSDOCKERTAG) $(FSDIR)/debian/patches/series
 	@docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(FSPREFIX)/debian fsdocker:$(VERSION) ./bootstrap.sh -c$(BUILDNAME)
 	@echo dpkg-buildpackage -us -uc
-	@true && docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(FSPREFIX) fsdocker:$(VERSION) dpkg-buildpackage -us -uc
-	@true || docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(FSPREFIX) fsdocker:$(VERSION) bash
+	@$(FSBUILDPACKAGE) && docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(FSPREFIX) fsdocker:$(VERSION) dpkg-buildpackage -us -uc || ( echo -e "\n\n  *** If this complained about errors in dpkg-source, run 'make fsclean' ***\n\n"; exit 9 )
+	@$(FSBUILDPACKAGE) || docker run --rm $(VOLUMES) -it -w /usr/local/build/SOURCES/$(FSPREFIX) fsdocker:$(VERSION) bash
+
+.PHONY: fsclean
+fsclean:
+	@echo Removing $(FSDIR) - run 'make debs' to recreate
+	@rm -rf $(FSDIR)
 
 FSBINS=$(addprefix $(FSDIR)/libs/,$(FSDEPS))
 FSSRCPATCHDIR=$(ROOT)/patches/freeswitch
@@ -75,21 +85,25 @@ $(BUILDSOURCE)/$(FSBUILDFILENAME): $(DOWNLOADS)/$(FSFILENAME)
 ## Take all the debs we have previously built, and stick them in a tarball,
 ## which we inject into the container. Explicitly delete the tarball if
 ## files are missing, so make doesn't get confused
-ALLDEBS=$(addprefix $(DEBDEST)/,$(SRCDEBS))
+ALLFSDEBS=$(addprefix $(DEBDEST)/,$(SRCDEBS))
 
 ## The sort is there to remove duplicates that may have accidentally
 ## snuck into SRCDEBS
-$(ROOT)/fsdocker/alldebs.tar.gz: $(ALLDEBS)
+$(ROOT)/fsdocker/alldebs.tar.gz: $(ALLFSDEBS)
 	tar -C $(DEBDEST) -zcvf $@ $(sort $(SRCDEBS)) || ( rm -f $@; exit 1 )
 
 ## Debugging for alldebs creation
-alldebs: $(ROOT)/fsdocker/alldebs.tar.gz
+.PHONY: fsdebs
+fsdebs: $(ROOT)/fsdocker/alldebs.tar.gz
 	tar tvf $<
 
 $(FSDOCKERTAG): $(BASEDOCKERTAG) $(ROOT)/fsdocker/alldebs.tar.gz $(wildcard $(ROOT)/fsdocker/*)
 	@echo Starting $(@)
 	docker build --build-arg VERSION=$(VERSION) -t fsdocker:$(VERSION) fsdocker
 	touch $(@)
+
+## Generate a list of built debs for this release
+FSDEBSCREATED=$(wildcard $(shell awk '/Package: / { print "$(BUILDSOURCE)/"$$2"_$(FSRELEASE)*.deb" }' $(FSDIR)/debian/control))
 
 ##
 ##
